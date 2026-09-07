@@ -29,7 +29,7 @@ services:
       - key: R2_SECRET_ACCESS_KEY
         sync: false
       - key: R2_BUCKET
-        value: kuvo-media
+        value: kuzo-backend-storage
       - key: R2_PUBLIC_BASE
         sync: false
       - key: TERMII_API_KEY
