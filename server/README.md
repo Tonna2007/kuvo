@@ -33,13 +33,11 @@ Dev OTP is `1234`. Tap **Send code (SMS test)** in the app only when `TERMII_API
 
 The phone never uses a Supabase or Cloudflare **API key**. It only calls this Go API.
 
-**Database (no key paste):** `render.yaml` creates a Render Postgres (`kuvo-db`) and injects `DATABASE_URL` for you. In the Render dashboard you add the Blueprint / web service from this repo, root directory `server`. You do not open Supabase unless you want to.
+**Database (Supabase PostgreSQL):** The backend uses Supabase PostgreSQL as its default database via `DATABASE_URL`. In your Supabase dashboard, navigate to **Project Settings -> Database -> Connection String (URI)** and set `DATABASE_URL` in your Render environment variables.
 
-**Supabase is optional.** If you later prefer Supabase’s site, copy the Postgres URI (not the anon JWT) into `DATABASE_URL`. That is a database login for the server, not a public app key.
+**Cloudflare R2** needs access keys in Render env vars (`R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_BASE`). Until R2 is set, files stay on the API disk (fine for local testing, but R2 is required for production).
 
-**Cloudflare R2** still needs access keys in Render env vars. There is no “connect R2” button that skips keys — that is how object storage works. Until R2 is set, files stay on the API disk (fine for a first Render test, not for two phones after a restart).
-
-**Do not** use Supabase → Settings → GitHub. That only syncs Supabase migrations/functions. It does not run the Kuvo Go API and it does not give the phone an API URL.
+**Do not** use Supabase → Settings → GitHub integration. That only syncs Supabase edge functions/migrations. Render runs the Go API server, which connects to your Supabase Postgres database via `DATABASE_URL`.
 
 Use **Render + GitHub** instead (steps in the message / HOSTING.md).
 
