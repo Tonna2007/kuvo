@@ -39,11 +39,9 @@ The phone never uses a Supabase or Cloudflare **API key**. It only calls this Go
 
 **Cloudflare R2** still needs access keys in Render env vars. There is no “connect R2” button that skips keys — that is how object storage works. Until R2 is set, files stay on the API disk (fine for a first Render test, not for two phones after a restart).
 
-1. Connect GitHub repo `Tonna2007/kuvo` on Render.
-2. Root directory: `server`. Docker. Health check: `/v1/health`.
-3. Apply the Blueprint so `kuvo-db` is created and linked.
-4. **Termii:** leave empty. Code stays `1234`.
-5. Send the public API URL (e.g. `https://kuvo-api.onrender.com`) so the APK can be rebuilt against it.
+**Do not** use Supabase → Settings → GitHub. That only syncs Supabase migrations/functions. It does not run the Kuvo Go API and it does not give the phone an API URL.
+
+Use **Render + GitHub** instead (steps in the message / HOSTING.md).
 
 ## Layout
 
