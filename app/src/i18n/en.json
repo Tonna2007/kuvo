@@ -1,0 +1,19 @@
+{
+  "tabs.chats": "Chats",
+  "tabs.gist": "Gist",
+  "tabs.groups": "Groups",
+  "tabs.calls": "Calls",
+  "fab.chat": "Chat",
+  "fab.group": "Group",
+  "fab.call": "Call",
+  "fab.you": "You",
+  "gist.youAreIn": "You're on the {campus} feed",
+  "gist.noCampus": "Pick a campus to see people from your school.",
+  "gist.composer": "Share a text, photo, video, or voice note…",
+  "gist.empty": "No campus posts yet. Be the first.",
+  "calls.empty": "No calls yet. Tap + and Call to ring someone who's on Kuvo.",
+  "calls.missed": "They didn't pick up — both of you need the app open on the same API.",
+  "help.title": "Help",
+  "language.title": "App language",
+  "language.hint": "English ships with the app. To add another language, drop a JSON file next to en.json and register it — no screen recoding."
+}

@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>App UI/UX Prototype — working name: Kuvo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#145C38;
+    --green-dark:#0B3D26;
+    --green-darker:#072A1A;
+    --gold:#E3A857;
+    --gold-light:#F6E6C9;
+    --white:#FFFFFF;
+    --surface:#FFFFFF;
+    --card:#F1F5F1;
+    --border:#E4E4DE;
+    --text-dark:#1E1E1C;
+    --text-muted:#5B5D57;
+    --text-on-dark:#F4F2EC;
+    --text-on-dark-muted:#BFD3C6;
+    --bubble-gray:#F1F1ED;
+  }
+  *{box-sizing:border-box;}
+  .screen, .screen *{ transition:background-color .3s ease, color .3s ease, border-color .3s ease; }
+  body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(180deg,#0B3D26 0%, #061B12 100%);
+    font-family:'Inter',sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+  }
+  .rig{
+    display:flex;
+    gap:56px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .side-note{
+    max-width:230px;
+    color:var(--text-on-dark-muted);
+    font-size:13px;
+    line-height:1.6;
+    padding-top:40px;
+  }
+  .side-note h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:19px;
+    color:#FFFFFF;
+    margin:0 0 10px;
+  }
+  .side-note .flow-list{margin-top:18px;}
+  .side-note .flow-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:7px 0;
+    cursor:pointer;
+    color:var(--text-on-dark-muted);
+    font-size:13px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .side-note .flow-item.active{color:var(--gold); font-weight:600;}
+  .side-note .flow-group-label{ font-size:10px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-on-dark-muted); opacity:0.55; margin:16px 0 2px; }
+  .side-note .flow-item .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:currentColor; flex-shrink:0;
+  }
+
+  .device{
+    width:340px;
+    height:700px;
+    background:#000;
+    border-radius:46px;
+    padding:12px;
+    box-shadow:0 30px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06);
+    position:relative;
+  }
+  .screen{
+    width:100%; height:100%;
+    background:var(--surface);
+    border-radius:34px;
+    overflow:hidden;
+    position:relative;
+  }
+  .notch{
+    position:absolute; top:12px; left:50%; transform:translateX(-50%);
+    width:110px; height:22px; background:#000; border-radius:14px; z-index:50;
+  }
+
+  .view{
+    position:absolute; top:0; left:0; right:0; bottom:0;
+    display:flex; flex-direction:column;
+    opacity:0; pointer-events:none;
+    transform:translateY(6px);
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .view.active{ opacity:1; pointer-events:auto; transform:translateY(0); }
+
+  .status-bar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 24px 4px; font-size:14px; font-weight:600; color:var(--text-dark);
+    flex-shrink:0;
+  }
+
+  /* ---------- Onboarding / Splash ---------- */
+  #view-splash{ background:var(--green-darker); align-items:center; justify-content:center; text-align:center; padding:40px; }
+  #view-splash .mark{ width:76px; height:76px; margin-bottom:22px; }
+  #view-splash h1{ font-family:'Fraunces',serif; font-weight:600; font-size:30px; color:var(--white); margin:0 0 8px; letter-spacing:-0.01em;}
+  #view-splash .work-name{ color:var(--gold); }
+  #view-splash p{ color:var(--text-on-dark-muted); font-size:14px; line-height:1.6; margin:0 0 40px; max-width:250px; }
+  .btn-primary{
+    background:var(--gold); color:var(--green-darker); border:none;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:15px;
+    padding:14px 0; width:100%; border-radius:14px; cursor:pointer;
+  }
+  .btn-ghost{
+    background:transparent; color:var(--text-on-dark-muted); border:none;
+    font-family:'Inter',sans-serif; font-size:13px; margin-top:14px; cursor:pointer;
+  }
+
+  /* ---------- Phone entry ---------- */
+  #view-phone{ background:var(--surface); padding:0 28px; justify-content:flex-start; }
+  .back-row{ display:flex; align-items:center; gap:10px; padding:8px 0 20px; cursor:pointer; }
+  .back-row svg{ width:18px; height:18px; }
+  #view-phone h2{ font-family:'Fraunces',serif; font-weight:600; font-size:24px; margin:6px 0 8px; color:var(--text-dark);}
+  #view-phone p.sub{ color:var(--text-muted); font-size:13.5px; line-height:1.55; margin:0 0 26px; }
+  .field-label{ font-size:12px; color:var(--text-muted); margin-bottom:6px; display:block; }
+  .field{
+    display:flex; align-items:center; gap:10px;
+    border:1.5px solid var(--border); border-radius:12px; padding:13px 14px; margin-bottom:20px;
+  }
+  .field.otp{ letter-spacing:8px; font-size:18px; font-weight:600; justify-content:center; }
+  .field input{
+    border:none; outline:none; font-family:'Inter',sans-serif; font-size:15px; width:100%; color:var(--text-dark);
+  }
+  .field .cc{ color:var(--text-muted); font-size:15px; border-right:1.5px solid var(--border); padding-right:10px; }
+
+  /* ---------- App shell (chats/status/settings) ---------- */
+  .app-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:2px 20px 10px;
+  }
+  .app-header .title{ font-family:'Fraunces',serif; font-weight:600; font-size:26px; color:var(--text-dark); }
+  .icon-btn{ width:20px; height:20px; color:var(--text-muted); }
+  .header-icons{ display:flex; gap:16px; align-items:center; }
+
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:#DFF2E7; color:#0F5C38; font-size:11px; font-weight:600;
+    padding:5px 10px; border-radius:20px; margin:0 20px 12px;
+  }
+
+  .list-scroll{ flex:1; overflow-y:auto; padding-bottom:6px; }
+  .chat-row{
+    display:flex; align-items:center; gap:12px; padding:10px 20px;
+    border-bottom:1px solid var(--border); cursor:pointer;
+  }
+  .avatar{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:14px; color:var(--white);
+  }
+  .a-green{ background:var(--green); } .a-gold{ background:var(--gold); color:var(--green-darker); }
+  .a-dark{ background:var(--green-dark); }
+  .chat-meta{ flex:1; min-width:0; }
+  .chat-meta .name{ font-weight:600; font-size:14.5px; color:var(--text-dark); }
+  .chat-meta .msg{ font-size:12.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;}
+  .chat-side{ display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+  .chat-side .time{ font-size:10.5px; color:var(--text-muted); }
+  .badge{ background:var(--green); color:var(--white); font-size:10px; font-weight:700; min-width:16px; height:16px; border-radius:8px; display:flex; align-items:center; justify-content:center; padding:0 4px;}
+
+  .bottom-nav{
+    display:flex; justify-content:space-around; align-items:center;
+    padding:10px 0 18px; border-top:1px solid var(--border); background:var(--surface); flex-shrink:0;
+  }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; color:var(--text-muted); }
+  .nav-item.active{ color:var(--green); }
+  .nav-item svg{ width:21px; height:21px; }
+  .nav-item span{ font-size:10px; font-weight:600; }
+
+  /* ---------- Conversation ---------- */
+  #view-convo .convo-header, #view-group-convo .convo-header{ display:flex; align-items:center; gap:10px; padding:14px 18px 12px; border-bottom:1px solid var(--border); flex-wrap:nowrap; }
+  #view-convo .convo-header .name, #view-group-convo .convo-header .name{ font-weight:600; font-size:15px; color:var(--text-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #view-convo .convo-header .status, #view-group-convo .convo-header .status{ font-size:11.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .convo-header-meta{ flex:1; min-width:0; }
+  .msgs{ flex:1; overflow-y:auto; padding:16px 14px; display:flex; flex-direction:column; gap:9px; background:var(--wallpaper, var(--surface)); }
+  .bubble{ max-width:74%; padding:10px 14px; border-radius:16px; font-size:13.5px; line-height:1.45; }
+  .bubble.in{ align-self:flex-start; background:var(--bubble-gray); color:var(--text-dark); border-bottom-left-radius:5px; }
+  .bubble.out{ align-self:flex-end; background:var(--green); color:var(--white); border-bottom-right-radius:5px; }
+  .composer{ display:flex; align-items:center; gap:10px; padding:10px 14px 16px; border-top:1px solid var(--border); }
+  .composer .box{ flex:1; background:#F5F5F2; border:1px solid var(--border); border-radius:20px; padding:9px 16px; font-size:13.5px; color:var(--text-muted); }
+  .send-btn{ width:36px; height:36px; border-radius:50%; background:var(--green); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--white); }
+
+  /* ---------- Gist (status/campus feed) ---------- */
+  .story-row{ display:flex; gap:14px; padding:6px 20px 16px; overflow-x:auto; }
+  .story{ text-align:center; flex-shrink:0; }
+  .story .ring{ width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid var(--gold); }
+  .story.you .ring{ border:2px dashed var(--border); color:var(--text-muted); }
+  .story .label{ font-size:10px; color:var(--text-muted); margin-top:5px; max-width:56px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .section-label{ font-size:11.5px; font-weight:600; color:var(--text-muted); padding:0 20px 10px; }
+  .post{ display:flex; gap:10px; padding:10px 20px; border-bottom:1px solid var(--border); }
+  .post .name{ font-size:13px; font-weight:600; color:var(--text-dark); }
+  .post .time{ font-size:10.5px; color:var(--text-muted); font-weight:400; }
+  .post .txt{ font-size:12.5px; color:var(--text-muted); margin-top:2px; }
+
+  /* ---------- Settings ---------- */
+  .profile-row{ display:flex; align-items:center; gap:14px; padding:10px 20px 18px; border-bottom:1px solid var(--border); margin-bottom:6px; }
+  .profile-row .pname{ font-weight:600; font-size:15px; color:var(--text-dark); }
+  .profile-row .puni{ font-size:12px; color:var(--text-muted); }
+  .setting-row{ display:flex; align-items:center; gap:14px; padding:12px 20px; border-bottom:1px solid var(--border); cursor:pointer; }
+  .setting-row .ic{ width:34px; height:34px; border-radius:10px; background:var(--card); display:flex; align-items:center; justify-content:center; color:var(--green); flex-shrink:0; }
+  .setting-row .label{ flex:1; font-size:13.5px; color:var(--text-dark); }
+  .setting-row .chev{ color:var(--text-muted); }
+
+  /* ---------- Registration: name / campus / verify ---------- */
+  .search-field{
+    display:flex; align-items:center; gap:8px;
+    border:1.5px solid var(--border); border-radius:12px; padding:11px 14px; margin-bottom:14px;
+  }
+  .search-field svg{ width:16px; height:16px; color:var(--text-muted); flex-shrink:0; }
+  .search-field input{ border:none; outline:none; font-family:'Inter',sans-serif; font-size:14px; width:100%; color:var(--text-dark); }
+  .campus-scroll{ flex:1; overflow-y:auto; padding:0 28px 10px; }
+  .campus-row{
+    display:flex; align-items:center; gap:12px; padding:12px 4px;
+    border-bottom:1px solid var(--border); cursor:pointer;
+  }
+  .campus-row .c-icon{ width:36px; height:36px; border-radius:10px; background:var(--card); display:flex; align-items:center; justify-content:center; color:var(--green); flex-shrink:0; font-weight:700; font-size:12px; }
+  .campus-row .c-info{ flex:1; }
+  .campus-row .c-name{ font-size:13.5px; font-weight:600; color:var(--text-dark); }
+  .campus-row .c-city{ font-size:11.5px; color:var(--text-muted); }
+  .campus-row .c-check{ width:20px; height:20px; border-radius:50%; border:1.5px solid var(--border); flex-shrink:0; }
+  .campus-row.selected .c-check{ background:var(--green); border-color:var(--green); position:relative; }
+  .campus-row.selected .c-check::after{ content:"✓"; color:#fff; font-size:12px; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .campus-row.selected .c-name{ color:var(--green); }
+  .selected-chip{
+    display:flex; align-items:center; gap:10px; background:var(--card); border-radius:12px;
+    padding:12px 14px; margin-bottom:18px;
+  }
+  .selected-chip .c-icon{ width:34px; height:34px; border-radius:9px; background:var(--green); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; }
+  .selected-chip .c-name{ font-size:13.5px; font-weight:600; color:var(--text-dark); }
+  .selected-chip .c-city{ font-size:11px; color:var(--text-muted); }
+  .hint-box{
+    background:var(--gold-light); border-radius:12px; padding:12px 14px; margin-top:6px;
+    font-size:12px; color:#6B4E1E; line-height:1.55;
+  }
+  .divider-row{ display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--text-muted); font-size:12px; }
+  .divider-row::before, .divider-row::after{ content:""; flex:1; height:1px; background:var(--border); }
+  .btn-secondary{
+    background:var(--surface); color:var(--text-dark); border:1.5px solid var(--border);
+    font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
+    padding:12px 0; width:100%; border-radius:14px; cursor:pointer;
+  }
+
+  /* ---------- Action sheet (3-dot menus, attachments) ---------- */
+  .sheet-overlay{
+    position:absolute; top:0; left:0; right:0; bottom:0;
+    background:rgba(7,20,13,0.45);
+    opacity:0; pointer-events:none;
+    transition:opacity .2s ease;
+    z-index:80;
+    display:flex; align-items:flex-end;
+  }
+  .sheet-overlay.open{ opacity:1; pointer-events:auto; }
+  .sheet-panel{
+    background:var(--surface); width:100%; border-radius:22px 22px 0 0;
+    padding:8px 0 22px; transform:translateY(100%); transition:transform .25s ease;
+  }
+  .sheet-overlay.open .sheet-panel{ transform:translateY(0); }
+  .sheet-handle{ width:36px; height:4px; background:var(--border); border-radius:2px; margin:8px auto 10px; }
+  .sheet-title{ font-family:'Fraunces',serif; font-weight:600; font-size:15px; color:var(--text-dark); padding:0 20px 8px; }
+  .sheet-item{ display:flex; align-items:center; gap:14px; padding:12px 20px; cursor:pointer; }
+  .sheet-item .ic{ width:34px; height:34px; border-radius:10px; background:var(--card); display:flex; align-items:center; justify-content:center; color:var(--green); flex-shrink:0; }
+  .sheet-item .label{ font-size:14px; color:var(--text-dark); }
+  .sheet-item.danger .ic{ background:#FBE9E7; color:#C0392B; }
+  .sheet-item.danger .label{ color:#C0392B; }
+  .sheet-cancel{ margin:8px 20px 0; padding:12px 0; text-align:center; background:var(--card); border-radius:14px; font-size:14px; font-weight:600; color:var(--text-dark); cursor:pointer; }
+
+  /* ---------- Group chat ---------- */
+  .group-avatar-stack{ display:flex; align-items:center; width:40px; height:34px; flex-shrink:0; position:relative; }
+  .group-avatar-stack .avatar{ position:absolute; width:26px; height:26px; font-size:9px; border:2px solid var(--white); }
+  .sender-label{ font-size:11px; font-weight:600; margin:0 0 3px 2px; }
+  .bubble-wrap{ display:flex; flex-direction:column; align-self:flex-start; max-width:74%; }
+  .bubble-wrap.mine{ align-self:flex-end; align-items:flex-end; }
+  .attach-bubble{
+    background:var(--bubble-gray); border-radius:16px; overflow:hidden; max-width:220px;
+  }
+  .attach-bubble img{ display:block; width:100%; height:130px; object-fit:cover; }
+  .attach-bubble .cap{ padding:8px 12px; font-size:12.5px; color:var(--text-dark); }
+  .doc-bubble{
+    display:flex; align-items:center; gap:10px; background:var(--bubble-gray); border-radius:14px; padding:10px 12px; max-width:230px;
+  }
+  .doc-bubble .doc-ic{ width:36px; height:36px; border-radius:9px; background:var(--gold-light); color:#8A5A16; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .doc-bubble .doc-name{ font-size:12.5px; font-weight:600; color:var(--text-dark); }
+  .doc-bubble .doc-size{ font-size:10.5px; color:var(--text-muted); }
+
+  /* ---------- Toggle switch ---------- */
+  .toggle{ width:42px; height:24px; border-radius:12px; background:var(--border); position:relative; cursor:pointer; flex-shrink:0; transition:background .18s ease; }
+  .toggle .knob{ width:20px; height:20px; border-radius:50%; background:var(--white); position:absolute; top:2px; left:2px; transition:left .18s ease; box-shadow:0 1px 2px rgba(0,0,0,0.2); }
+  .toggle.on{ background:var(--green); }
+  .toggle.on .knob{ left:20px; }
+
+  /* ---------- Sub-screen scaffolding ---------- */
+  .subscreen-header{ display:flex; align-items:center; gap:12px; padding:14px 20px 16px; }
+  .subscreen-header h2{ font-family:'Fraunces',serif; font-weight:600; font-size:21px; margin:0; color:var(--text-dark); }
+  .section-heading{ font-size:11.5px; font-weight:700; color:var(--text-muted); letter-spacing:0.02em; padding:14px 20px 6px; }
+  .toggle-row{ display:flex; align-items:center; gap:14px; padding:12px 20px; border-bottom:1px solid var(--border); }
+  .toggle-row .tinfo{ flex:1; }
+  .toggle-row .tlabel{ font-size:13.5px; color:var(--text-dark); font-weight:500; }
+  .toggle-row .tdesc{ font-size:11.5px; color:var(--text-muted); margin-top:2px; line-height:1.4; }
+
+  /* ---------- Contact / member picker ---------- */
+  .contact-row{ display:flex; align-items:center; gap:12px; padding:11px 20px; border-bottom:1px solid var(--border); cursor:pointer; }
+  .contact-row .cname{ font-size:13.5px; font-weight:600; color:var(--text-dark); }
+  .contact-row .ccampus{ font-size:11.5px; color:var(--text-muted); }
+  .contact-check{ width:22px; height:22px; border-radius:50%; border:1.5px solid var(--border); flex-shrink:0; position:relative; }
+  .contact-row.picked .contact-check{ background:var(--green); border-color:var(--green); }
+  .contact-row.picked .contact-check::after{ content:"✓"; color:#fff; font-size:12px; position:absolute; top:0;left:0;right:0;bottom:0; display:flex; align-items:center; justify-content:center; }
+  .selected-count{ padding:4px 20px 14px; font-size:12px; color:var(--text-muted); }
+
+  /* ---------- Editable avatar ---------- */
+  .avatar-edit{ position:relative; width:88px; height:88px; margin:6px auto 18px; }
+  .avatar-edit .avatar{ width:88px; height:88px; font-size:26px; }
+  .avatar-edit .cam-badge{ position:absolute; bottom:0; right:0; width:30px; height:30px; border-radius:50%; background:var(--gold); border:3px solid var(--white); display:flex; align-items:center; justify-content:center; color:var(--green-darker); cursor:pointer; }
+  .group-icon-edit{ position:relative; width:74px; height:74px; margin:10px auto 22px; }
+  .group-icon-edit .gcircle{ width:74px; height:74px; border-radius:50%; background:var(--card); display:flex; align-items:center; justify-content:center; color:var(--text-muted); cursor:pointer; }
+  .group-icon-edit .cam-badge{ position:absolute; bottom:0; right:0; width:26px; height:26px; border-radius:50%; background:var(--gold); border:2.5px solid var(--white); display:flex; align-items:center; justify-content:center; color:var(--green-darker); }
+
+  /* ---------- Theme swatches ---------- */
+  .swatch-row{ display:flex; gap:14px; padding:6px 20px 18px; flex-wrap:wrap; }
+  .swatch{ width:44px; height:44px; border-radius:50%; cursor:pointer; position:relative; border:3px solid transparent; }
+  .swatch.selected{ border-color:var(--text-dark); }
+  .swatch.selected::after{ content:"✓"; color:#fff; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .mode-toggle{ display:flex; gap:8px; padding:4px 20px 18px; }
+  .mode-opt{ flex:1; text-align:center; padding:10px 0; border-radius:12px; border:1.5px solid var(--border); font-size:13px; font-weight:600; color:var(--text-muted); cursor:pointer; }
+  .mode-opt.selected{ background:var(--green); border-color:var(--green); color:var(--white); }
+
+  /* ---------- Wallpaper grid ---------- */
+  .wallpaper-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; padding:6px 20px 20px; }
+  .wp-tile{ aspect-ratio:9/16; border-radius:14px; cursor:pointer; position:relative; border:2.5px solid transparent; }
+  .wp-tile.selected{ border-color:var(--green); }
+  .wp-tile.selected::after{ content:"✓"; position:absolute; top:6px; right:6px; width:18px; height:18px; border-radius:50%; background:var(--green); color:#fff; font-size:10px; display:flex; align-items:center; justify-content:center; }
+
+  /* ---------- Danger row ---------- */
+  .danger-row{ padding:14px 20px; text-align:center; font-size:13.5px; font-weight:600; color:#C0392B; cursor:pointer; }
+
+  /* ---------- Account / edit profile ---------- */
+  .avatar-edit-wrap{ position:relative; width:88px; height:88px; margin:6px auto 22px; }
+  .avatar-edit-wrap .avatar{ width:88px; height:88px; font-size:26px; }
+  .avatar-edit-badge{
+    position:absolute; bottom:0; right:0; width:30px; height:30px; border-radius:50%;
+    background:var(--green); border:3px solid var(--white); display:flex; align-items:center; justify-content:center;
+    color:#fff; cursor:pointer;
+  }
+  .field-static{
+    border:1.5px solid var(--border); border-radius:12px; padding:13px 14px; margin-bottom:20px;
+    font-size:15px; color:var(--text-muted); background:var(--card);
+  }
+  textarea.ta{
+    border:1.5px solid var(--border); border-radius:12px; padding:13px 14px; margin-bottom:20px;
+    font-family:'Inter',sans-serif; font-size:14px; width:100%; color:var(--text-dark); resize:none; height:76px; outline:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="rig">
+
+  <div class="side-note">
+    <h3>Prototype flow</h3>
+    <p>Tap a step to jump straight to it. Buttons inside the phone move you through the real flow.</p>
+    <div class="flow-list">
+      <div class="flow-item active" data-goto="splash"><span class="dot"></span>Splash</div>
+      <div class="flow-item" data-goto="phone"><span class="dot"></span>Phone entry</div>
+      <div class="flow-item" data-goto="otp"><span class="dot"></span>Verify code</div>
+      <div class="flow-item" data-goto="name"><span class="dot"></span>Your name</div>
+      <div class="flow-item" data-goto="campus"><span class="dot"></span>Your campus</div>
+      <div class="flow-item" data-goto="verify"><span class="dot"></span>Verify campus</div>
+
+      <div class="flow-group-label">Core app</div>
+      <div class="flow-item" data-goto="chats"><span class="dot"></span>Chats</div>
+      <div class="flow-item" data-goto="convo"><span class="dot"></span>Conversation</div>
+      <div class="flow-item" data-goto="group-convo"><span class="dot"></span>Group chat</div>
+      <div class="flow-item" data-goto="group-info"><span class="dot"></span>Group info</div>
+      <div class="flow-item" data-goto="status"><span class="dot"></span>Gist &amp; campus feed</div>
+
+      <div class="flow-group-label">New group</div>
+      <div class="flow-item" data-goto="newgroup-members"><span class="dot"></span>Add members</div>
+      <div class="flow-item" data-goto="newgroup-details"><span class="dot"></span>Name group</div>
+
+      <div class="flow-group-label">Settings</div>
+      <div class="flow-item" data-goto="settings"><span class="dot"></span>Settings home</div>
+      <div class="flow-item" data-goto="edit-profile"><span class="dot"></span>Edit profile</div>
+      <div class="flow-item" data-goto="account"><span class="dot"></span>Account</div>
+      <div class="flow-item" data-goto="privacy"><span class="dot"></span>Privacy</div>
+      <div class="flow-item" data-goto="data"><span class="dot"></span>Data & low bandwidth</div>
+      <div class="flow-item" data-goto="notifications"><span class="dot"></span>Notifications</div>
+      <div class="flow-item" data-goto="appearance"><span class="dot"></span>Appearance</div>
+      <div class="flow-item" data-goto="wallpaper"><span class="dot"></span>Wallpaper</div>
+    </div>
+  </div>
+
+  <div class="device">
+    <div class="notch"></div>
+    <div class="screen">
+
+      <!-- SPLASH -->
+      <div class="view active" id="view-splash">
+        <svg class="mark" viewBox="0 0 100 100">
+          <rect width="100" height="100" rx="22" fill="#145C38"/>
+          <circle cx="66" cy="66" r="26" fill="#0B3D26"/>
+          <circle cx="46" cy="70" r="18" fill="#0B3D26"/>
+          <circle cx="70" cy="18" r="8" fill="#E3A857"/>
+          <text x="20" y="58" font-family="Fraunces, serif" font-weight="700" font-size="40" fill="#fff">K</text>
+        </svg>
+        <h1>A messaging app<br>built for <span class="work-name">us</span></h1>
+        <p>Working name: Kuvo. Naira-priced, built for how we actually chat.</p>
+        <button class="btn-primary" style="max-width:220px;" data-goto="phone">Get started</button>
+        <button class="btn-ghost" data-goto="chats">Skip to app preview</button>
+      </div>
+
+      <!-- PHONE ENTRY -->
+      <div class="view" id="view-phone">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="back-row" data-goto="splash">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <h2>What's your number?</h2>
+        <p class="sub">We'll send a code to verify it's you. No one sees this number unless you share it.</p>
+        <span class="field-label">Phone number</span>
+        <div class="field">
+          <span class="cc">+234</span>
+          <input type="tel" placeholder="801 234 5678" value="801 234 5678" />
+        </div>
+        <button class="btn-primary" data-goto="otp">Send code</button>
+      </div>
+
+      <!-- OTP -->
+      <div class="view" id="view-otp">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="back-row" data-goto="phone" style="padding-left:28px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div style="padding:0 28px;">
+          <h2>Enter the code</h2>
+          <p class="sub">Sent to +234 801 234 5678</p>
+          <div class="field otp">4 &nbsp; 2 &nbsp; 9 &nbsp; 1</div>
+          <button class="btn-primary" data-goto="name">Verify &amp; continue</button>
+          <button class="btn-ghost" style="color:var(--text-muted);" data-goto="phone">Wrong number? Edit</button>
+        </div>
+      </div>
+
+      <!-- NAME -->
+      <div class="view" id="view-name">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="back-row" data-goto="otp" style="padding-left:28px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div style="padding:0 28px;">
+          <h2>What's your name?</h2>
+          <p class="sub">This is what people you chat with will see.</p>
+          <div class="avatar-upload">
+            <div class="av-circle" data-sheet="avatar-menu">
+              EE
+              <div class="av-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+            </div>
+            <span class="av-label" data-sheet="avatar-menu">Add photo</span>
+          </div>
+          <span class="field-label">Full name</span>
+          <div class="field">
+            <input type="text" placeholder="e.g. Eme Emmanuel" value="Eme Emmanuel" />
+          </div>
+          <button class="btn-primary" data-goto="campus">Continue</button>
+        </div>
+      </div>
+
+      <!-- CAMPUS -->
+      <div class="view" id="view-campus">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="back-row" data-goto="name" style="padding-left:28px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div style="padding:0 28px;">
+          <h2>What's your campus?</h2>
+          <p class="sub" style="margin-bottom:16px;">This links you to your campus feed and cross-campus chats.</p>
+          <div class="search-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" placeholder="Search your university" />
+          </div>
+        </div>
+        <div class="campus-scroll" id="campus-list"></div>
+        <div style="padding:14px 28px 20px;">
+          <button class="btn-primary" data-goto="verify">Continue</button>
+        </div>
+      </div>
+
+      <!-- VERIFY CAMPUS -->
+      <div class="view" id="view-verify">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="back-row" data-goto="campus" style="padding-left:28px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div style="padding:0 28px;">
+          <h2>Verify your campus</h2>
+          <p class="sub">Confirmed students get a campus badge and access to campus-only spaces.</p>
+
+          <div class="selected-chip">
+            <div class="c-icon">KA</div>
+            <div>
+              <div class="c-name">KAAF University College</div>
+              <div class="c-city">Buduburam, Ghana</div>
+            </div>
+          </div>
+
+          <span class="field-label">School email</span>
+          <div class="field">
+            <input type="text" placeholder="you@kaaf.edu.gh" />
+          </div>
+          <button class="btn-primary" data-goto="chats">Send verification link</button>
+
+          <div class="divider-row">or</div>
+
+          <button class="btn-secondary" data-goto="chats">Upload student ID instead</button>
+
+          <div class="hint-box">You can start chatting before you verify — verifying just unlocks your campus badge and campus-only spaces later.</div>
+          <button class="btn-ghost" style="color:var(--text-muted);" data-goto="chats">Skip for now</button>
+        </div>
+      </div>
+
+
+      <div class="view" id="view-chats">
+        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+        <div class="app-header">
+          <span class="title">Kuvo</span>
+          <div class="header-icons">
+            <svg class="icon-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <svg class="icon-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-sheet="chat-menu" style="cursor:pointer;"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </div>
+        </div>
+        <div class="pill">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>
+          Low data mode on
+        </div>
+        <div class="list-scroll" id="chat-list"></div>
+        <div class="bottom-nav">
+          <div class="nav-item active" data-goto="chats">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+            <span>Chats</span>
+          </div>
+          <div class="nav-item" data-goto="status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg>
+            <span>Gist</span>
+          </div>
+          <div class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <span>Groups</span>
+          </div>
+          <div class="nav-item" data-goto="settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONVERSATION (1:1) -->
+      <div class="view" id="view-convo">
+        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+        <div class="convo-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="chats" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <div class="avatar a-green" style="width:34px;height:34px;font-size:12px;">CU</div>
+          <div class="convo-header-meta">
+            <div class="name">Chidera (UNILAG)</div>
+            <div class="status">online</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-sheet="convo-menu" style="cursor:pointer;"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </div>
+        <div class="msgs">
+          <div class="bubble in">You still coming for the cross-campus meetup Saturday?</div>
+          <div class="bubble out">Yeah, sending my location once I leave hostel</div>
+          <div class="bubble in">Bet. I'll hold a seat for you</div>
+          <div class="bubble out">🎤 0:14 voice note</div>
+        </div>
+        <div class="composer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-sheet="attach" style="cursor:pointer;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          <div class="box">Message</div>
+          <div class="send-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONVERSATION (group) -->
+      <div class="view" id="view-group-convo">
+        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+        <div class="convo-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="chats" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <div class="group-avatar-stack">
+            <div class="avatar a-gold" style="top:0; left:14px; z-index:2;">TB</div>
+            <div class="avatar a-green" style="top:10px; left:0; z-index:1;">AM</div>
+          </div>
+          <div class="convo-header-meta">
+            <div class="name">Cross-Campus Devs</div>
+            <div class="status">Tobi, Amara, Chidera + 3 more</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-sheet="group-menu" style="cursor:pointer;"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </div>
+        <div class="msgs">
+          <div class="bubble-wrap">
+            <span class="sender-label" style="color:var(--gold-dark, #A87732);">Tobi</span>
+            <div class="bubble in">Pushed the low-data mode toggle, someone review?</div>
+          </div>
+          <div class="bubble-wrap">
+            <span class="sender-label" style="color:#2E7D32;">Amara</span>
+            <div class="attach-bubble">
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop" alt="Screenshot attachment" />
+              <div class="cap">Here's the Figma screenshot for the new icon</div>
+            </div>
+          </div>
+          <div class="bubble-wrap mine">
+            <div class="doc-bubble" style="align-self:flex-end;">
+              <div class="doc-ic">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+              </div>
+              <div>
+                <div class="doc-name">go-to-market.pdf</div>
+                <div class="doc-size">2.4 MB</div>
+              </div>
+            </div>
+          </div>
+          <div class="bubble-wrap">
+            <span class="sender-label" style="color:var(--gold-dark, #A87732);">Tobi</span>
+            <div class="bubble in">Nice, reviewing now 👍</div>
+          </div>
+        </div>
+        <div class="composer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-sheet="attach" style="cursor:pointer;"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          <div class="box">Message</div>
+          <div class="send-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATUS / GIST -->
+      <div class="view" id="view-status">
+        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+        <div class="app-header"><span class="title">Gist</span>
+          <div class="header-icons">
+            <svg class="icon-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>
+            <svg class="icon-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-sheet="gist-menu" style="cursor:pointer;"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </div>
+        </div>
+        <div class="story-row" id="story-row"></div>
+        <div class="section-label">CAMPUS FEED</div>
+        <div class="list-scroll" id="post-list"></div>
+        <div class="bottom-nav">
+          <div class="nav-item" data-goto="chats">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+            <span>Chats</span>
+          </div>
+          <div class="nav-item active" data-goto="status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg>
+            <span>Gist</span>
+          </div>
+          <div class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <span>Groups</span>
+          </div>
+          <div class="nav-item" data-goto="settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="view" id="view-settings">
+        <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+        <div class="app-header"><span class="title" style="font-size:22px;">Settings</span></div>
+        <div class="profile-row" data-goto="edit-profile" style="cursor:pointer;">
+          <div class="avatar a-green" style="width:48px;height:48px;font-size:16px;">EM</div>
+          <div style="flex:1;">
+            <div class="pname">Eme T. Emmanuel</div>
+            <div class="puni">KAAF University College</div>
+          </div>
+          <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="list-scroll" id="settings-list"></div>
+        <div class="bottom-nav">
+          <div class="nav-item" data-goto="chats">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+            <span>Chats</span>
+          </div>
+          <div class="nav-item" data-goto="status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg>
+            <span>Gist</span>
+          </div>
+          <div class="nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <span>Groups</span>
+          </div>
+          <div class="nav-item active" data-goto="settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profile</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW GROUP: MEMBERS -->
+      <div class="view" id="view-newgroup-members">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="chats" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Add members</h2>
+        </div>
+        <div style="padding:0 20px;">
+          <div class="search-field" style="margin-bottom:4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" placeholder="Search contacts" />
+          </div>
+        </div>
+        <div class="selected-count" id="member-count">3 selected</div>
+        <div class="list-scroll" id="member-list"></div>
+        <div style="padding:14px 20px 20px;">
+          <button class="btn-primary" data-goto="newgroup-details">Next</button>
+        </div>
+      </div>
+
+      <!-- NEW GROUP: DETAILS -->
+      <div class="view" id="view-newgroup-details">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="newgroup-members" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Name this group</h2>
+        </div>
+        <div style="padding:0 28px;">
+          <div class="group-icon-edit" data-sheet="photo-picker">
+            <div class="gcircle">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+            <div class="cam-badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+          </div>
+          <span class="field-label">Group name</span>
+          <div class="field">
+            <input type="text" placeholder="e.g. Cross-Campus Devs" value="Cross-Campus Devs" />
+          </div>
+          <button class="btn-primary" data-goto="group-convo">Create group</button>
+        </div>
+      </div>
+
+      <!-- GROUP INFO -->
+      <div class="view" id="view-group-info">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="group-convo" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Group info</h2>
+        </div>
+        <div style="text-align:center; padding:4px 0 6px;">
+          <div class="avatar a-gold" style="width:76px;height:76px;font-size:24px;margin:0 auto 12px;">CD</div>
+          <div style="font-family:'Fraunces',serif; font-weight:600; font-size:18px; color:var(--text-dark);">Cross-Campus Devs</div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">6 members</div>
+        </div>
+        <div class="toggle-row" style="margin-top:10px;">
+          <div class="tinfo"><div class="tlabel">Mute notifications</div></div>
+          <div class="toggle" data-toggle></div>
+        </div>
+        <div class="section-heading">MEMBERS</div>
+        <div class="list-scroll" id="group-members"></div>
+        <div class="danger-row" data-goto="chats">Exit group</div>
+      </div>
+
+      <!-- EDIT PROFILE -->
+      <div class="view" id="view-edit-profile">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="settings" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Edit profile</h2>
+        </div>
+        <div class="avatar-edit" data-sheet="photo-picker">
+          <div class="avatar a-green">EM</div>
+          <div class="cam-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+        </div>
+        <div style="padding:0 28px;">
+          <span class="field-label">Name</span>
+          <div class="field"><input type="text" value="Eme Emmanuel" /></div>
+          <span class="field-label">About</span>
+          <div class="field"><input type="text" value="PharmD student, KAAF University College" /></div>
+          <span class="field-label">Phone number</span>
+          <div class="field" style="background:var(--card); border-color:var(--card);">
+            <input type="text" value="+234 801 234 5678" disabled style="color:var(--text-muted);" />
+          </div>
+          <button class="btn-primary" data-goto="settings">Save</button>
+        </div>
+      </div>
+
+      <!-- ACCOUNT -->
+      <div class="view" id="view-account">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="settings" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Account</h2>
+        </div>
+        <div class="setting-row"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div><div class="label">Phone number<br><span style="color:var(--text-muted);font-weight:400;font-size:12px;">+234 801 234 5678</span></div></div>
+        <div class="setting-row"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg></div><div class="label">School email<br><span style="color:#0F5C38;font-weight:600;font-size:12px;">✓ verified</span></div></div>
+        <div class="setting-row"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M13 9h6v12M9 9h.01M9 12h.01M9 15h.01"/></svg></div><div class="label">Campus<br><span style="color:#0F5C38;font-weight:600;font-size:12px;">KAAF University College ✓</span></div></div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Two-step verification</div><div class="tdesc">Extra PIN required when registering this number again</div></div>
+          <div class="toggle" data-toggle></div>
+        </div>
+        <div class="section-heading">DANGER ZONE</div>
+        <div class="danger-row" data-goto="settings">Delete my account</div>
+      </div>
+
+      <!-- PRIVACY -->
+      <div class="view" id="view-privacy">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="settings" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Privacy</h2>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Show last seen</div><div class="tdesc">Others can see when you were last online</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Read receipts</div><div class="tdesc">Send blue ticks when you've read a message</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Show campus badge</div><div class="tdesc">Display your verified campus on your profile</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="setting-row"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M4.9 4.9l14.2 14.2"/></svg></div><div class="label">Blocked contacts<br><span style="color:var(--text-muted);font-weight:400;font-size:12px;">2 blocked</span></div></div>
+      </div>
+
+      <!-- DATA & LOW BANDWIDTH -->
+      <div class="view" id="view-data">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="settings" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Data &amp; low bandwidth</h2>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Low data mode</div><div class="tdesc">Compresses media and pauses auto-download on weak networks</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Auto-download photos</div></div>
+          <div class="toggle" data-toggle></div>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Auto-download documents</div></div>
+          <div class="toggle" data-toggle></div>
+        </div>
+        <div class="setting-row"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div><div class="label">Storage used<br><span style="color:var(--text-muted);font-weight:400;font-size:12px;">128 MB of media</span></div></div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="view" id="view-notifications">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="settings" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Notifications</h2>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Message notifications</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Group notifications</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Show message preview</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Sound</div></div>
+          <div class="toggle on" data-toggle></div>
+        </div>
+        <div class="toggle-row">
+          <div class="tinfo"><div class="tlabel">Vibrate</div></div>
+          <div class="toggle" data-toggle></div>
+        </div>
+      </div>
+
+      <!-- APPEARANCE / THEME -->
+      <div class="view" id="view-appearance">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="settings" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Appearance</h2>
+        </div>
+        <div class="section-heading" style="padding-top:2px;">MODE</div>
+        <div class="mode-toggle">
+          <div class="mode-opt selected" data-mode>Light</div>
+          <div class="mode-opt" data-mode>Dark</div>
+          <div class="mode-opt" data-mode>System</div>
+        </div>
+        <div class="section-heading">THEME COLOR</div>
+        <div class="swatch-row">
+          <div class="swatch selected" style="background:#145C38;" data-swatch></div>
+          <div class="swatch" style="background:#1E5FA8;" data-swatch></div>
+          <div class="swatch" style="background:#B24D3E;" data-swatch></div>
+          <div class="swatch" style="background:#6B4FA0;" data-swatch></div>
+          <div class="swatch" style="background:#1E8A8A;" data-swatch></div>
+          <div class="swatch" style="background:#A84E7C;" data-swatch></div>
+        </div>
+        <div class="setting-row" data-goto="wallpaper"><div class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="label">Chat wallpaper</div></div>
+      </div>
+
+      <!-- WALLPAPER -->
+      <div class="view" id="view-wallpaper">
+        <div class="status-bar" style="padding-left:0;padding-right:0;"><span>9:41</span><span></span></div>
+        <div class="subscreen-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B5D57" stroke-width="2" data-goto="appearance" style="cursor:pointer;"><path d="M15 18l-6-6 6-6"/></svg>
+          <h2>Chat wallpaper</h2>
+        </div>
+        <div class="wallpaper-grid" id="wallpaper-grid"></div>
+        <div style="padding:4px 20px 20px;">
+          <button class="btn-primary" data-goto="appearance">Set wallpaper</button>
+        </div>
+      </div>
+
+
+      <div class="sheet-overlay" id="sheet-overlay">
+        <div class="sheet-panel">
+          <div class="sheet-handle"></div>
+          <div class="sheet-title" id="sheet-title"></div>
+          <div id="sheet-items"></div>
+          <div class="sheet-cancel" id="sheet-cancel">Cancel</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="side-note" style="padding-top:40px;">
+    <h3>Why these choices</h3>
+    <p><strong style="color:#E3A857;">Onboarding</strong> is phone-first, not email — matches how Nigerians actually sign up for messaging apps, and skips a step WhatsApp itself doesn't have.</p>
+    <p><strong style="color:#E3A857;">Low data mode</strong> stays visible on the chats screen, not buried in settings — it's a stated selling point, so it should be seen, not just configurable.</p>
+    <p><strong style="color:#E3A857;">Gist</strong> replaces the generic "Status" label — it's what people already call catching up on updates, and it keeps stories and campus posts in one screen so it costs one tap, not two.</p>
+  </div>
+
+</div>
+
+<script>
+  const chats = [
+    {n:"Chidera (UNILAG)", m:"Yeah, sending my location once I leave hostel", t:"2m", unread:2, i:"CU", c:"a-green", goto:"convo"},
+    {n:"KAAF Campus Group", m:"Tobi: anyone selling their old textbooks?", t:"14m", unread:5, i:"KC", c:"a-gold", goto:"group-convo"},
+    {n:"Amara", m:"lol you won't believe what happened", t:"31m", unread:0, i:"A", c:"a-dark", goto:"convo"},
+    {n:"Cross-Campus Devs", m:"You: pushed the fix, check it out", t:"1h", unread:0, i:"CD", c:"a-gold", goto:"group-convo"},
+    {n:"Emeka (UNIBEN)", m:"Voice note", t:"2h", unread:1, i:"EU", c:"a-green", goto:"convo"},
+    {n:"Study Group Bio201", m:"Ngozi: sending notes now", t:"3h", unread:0, i:"SG", c:"a-dark", goto:"group-convo"},
+  ];
+  document.getElementById('chat-list').innerHTML = chats.map(c => `
+    <div class="chat-row" data-goto="${c.goto || ''}">
+      <div class="avatar ${c.c}">${c.i}</div>
+      <div class="chat-meta">
+        <div class="name">${c.n}</div>
+        <div class="msg">${c.m}</div>
+      </div>
+      <div class="chat-side">
+        <span class="time">${c.t}</span>
+        ${c.unread ? `<span class="badge">${c.unread}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  const stories = [
+    {i:"You", you:true}, {i:"TK", c:"a-green"}, {i:"AM", c:"a-gold"}, {i:"BZ", c:"a-dark"}, {i:"CU", c:"a-green"}
+  ];
+  document.getElementById('story-row').innerHTML = stories.map(s => `
+    <div class="story ${s.you ? 'you' : ''}">
+      <div class="ring ${s.you ? '' : 'avatar ' + s.c}" style="${s.you ? '' : 'width:52px;height:52px;font-size:13px;'}">${s.you ? '+' : s.i}</div>
+      <div class="label">${s.you ? 'Your status' : s.i}</div>
+    </div>
+  `).join('');
+
+  const posts = [
+    {n:"Tobi (KAAF)", t:"20m", txt:"Selling my old organic chem textbook, DM if interested", i:"TK", c:"a-green"},
+    {n:"Amara (UNILAG)", t:"1h", txt:"Cross-campus meetup this Saturday was fire", i:"AM", c:"a-gold"},
+    {n:"Bezu (UNIBEN)", t:"3h", txt:"Anyone doing the Bio201 assignment? let's link", i:"BZ", c:"a-dark"},
+    {n:"Chidera (UNILAG)", t:"5h", txt:"Photo dump from the tech fair", i:"CU", c:"a-green"},
+  ];
+  document.getElementById('post-list').innerHTML = posts.map(p => `
+    <div class="post">
+      <div class="avatar ${p.c}" style="width:36px;height:36px;font-size:12px;">${p.i}</div>
+      <div>
+        <div class="name">${p.n} <span class="time">· ${p.t}</span></div>
+        <div class="txt">${p.txt}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const settings = [
+    {l:"Account", icon:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/>', goto:"account"},
+    {l:"Privacy", icon:'<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>', goto:"privacy"},
+    {l:"Data & low bandwidth mode", icon:'<path d="M13 2L3 14h7l-1 8 10-12h-7z"/>', goto:"data"},
+    {l:"Notifications", icon:'<path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/>', goto:"notifications"},
+    {l:"Appearance", icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', goto:"appearance"},
+    {l:"App language", icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18 15 15 0 010-18z"/>'},
+    {l:"Help", icon:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5"/><circle cx="12" cy="17" r=".5"/>'},
+    {l:"Invite friends", icon:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>'},
+  ];
+  document.getElementById('settings-list').innerHTML = settings.map(s => `
+    <div class="setting-row" data-goto="${s.goto || ''}">
+      <div class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${s.icon}</svg></div>
+      <div class="label">${s.l}</div>
+      <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  `).join('');
+
+  const campuses = [
+    {n:"KAAF University College", c:"Buduburam, Ghana", i:"KA"},
+    {n:"University of Lagos", c:"Lagos, Nigeria", i:"UL"},
+    {n:"University of Benin", c:"Benin City, Nigeria", i:"UB"},
+    {n:"University of Ibadan", c:"Ibadan, Nigeria", i:"UI"},
+    {n:"Obafemi Awolowo University", c:"Ile-Ife, Nigeria", i:"OA"},
+    {n:"Covenant University", c:"Ota, Nigeria", i:"CU"},
+    {n:"University of Nigeria, Nsukka", c:"Nsukka, Nigeria", i:"UN"},
+    {n:"Lagos State University", c:"Lagos, Nigeria", i:"LS"},
+  ];
+  function renderCampuses(filter){
+    const f = (filter || "").toLowerCase();
+    const rows = campuses.filter(c => c.n.toLowerCase().includes(f));
+    document.getElementById('campus-list').innerHTML = rows.map((c, idx) => `
+      <div class="campus-row ${idx === 0 ? 'selected' : ''}">
+        <div class="c-icon">${c.i}</div>
+        <div class="c-info">
+          <div class="c-name">${c.n}</div>
+          <div class="c-city">${c.c}</div>
+        </div>
+        <div class="c-check"></div>
+      </div>
+    `).join('') || `<p style="color:var(--text-muted);font-size:13px;padding:12px 4px;">No matches — try a different search.</p>`;
+    document.querySelectorAll('.campus-row').forEach(row => {
+      row.addEventListener('click', () => {
+        document.querySelectorAll('.campus-row').forEach(r => r.classList.remove('selected'));
+        row.classList.add('selected');
+      });
+    });
+  }
+  renderCampuses('');
+  document.querySelector('#view-campus .search-field input').addEventListener('input', e => renderCampuses(e.target.value));
+
+  const ICONS = {
+    group:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>',
+    star:'<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>',
+    settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>',
+    contact:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/>',
+    mute:'<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M22 9l-6 6M16 9l6 6"/>',
+    trash:'<path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/>',
+    exit:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
+    photo:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/>',
+    camera:'<path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>',
+    doc:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>',
+    pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>',
+    lock:'<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>',
+    archive:'<path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/>',
+  };
+  function svgIc(path){ return `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${path}</svg>`; }
+
+  const SHEETS = {
+    "chat-menu": { title:"Chats", items:[
+      {label:"New group", icon:"group", goto:"newgroup-members"},
+      {label:"Starred messages", icon:"star"},
+      {label:"Settings", icon:"settings", goto:"settings"},
+    ]},
+    "convo-menu": { title:"Chidera (UNILAG)", items:[
+      {label:"View contact", icon:"contact"},
+      {label:"Mute notifications", icon:"mute"},
+      {label:"Clear chat", icon:"trash", danger:true},
+      {label:"Block contact", icon:"trash", danger:true},
+    ]},
+    "group-menu": { title:"Cross-Campus Devs", items:[
+      {label:"Group info", icon:"group", goto:"group-info"},
+      {label:"Mute notifications", icon:"mute"},
+      {label:"Clear chat", icon:"trash", danger:true},
+      {label:"Exit group", icon:"exit", danger:true},
+    ]},
+    "gist-menu": { title:"Gist", items:[
+      {label:"Privacy", icon:"lock"},
+      {label:"Archive", icon:"archive"},
+      {label:"Settings", icon:"settings", goto:"settings"},
+    ]},
+    "attach": { title:"Share", items:[
+      {label:"Photos & video", icon:"photo"},
+      {label:"Camera", icon:"camera"},
+      {label:"Document", icon:"doc"},
+      {label:"Location", icon:"pin"},
+      {label:"Contact", icon:"contact"},
+    ]},
+    "photo-picker": { title:"Profile photo", items:[
+      {label:"Take photo", icon:"camera"},
+      {label:"Choose from gallery", icon:"photo"},
+      {label:"Remove photo", icon:"trash", danger:true},
+    ]},
+  };
+
+  function openSheet(key){
+    const data = SHEETS[key];
+    if(!data) return;
+    document.getElementById('sheet-title').textContent = data.title;
+    document.getElementById('sheet-items').innerHTML = data.items.map(it => `
+      <div class="sheet-item ${it.danger ? 'danger' : ''}" data-sheet-goto="${it.goto || ''}">
+        <div class="ic">${svgIc(ICONS[it.icon] || '')}</div>
+        <div class="label">${it.label}</div>
+      </div>
+    `).join('');
+    document.getElementById('sheet-overlay').classList.add('open');
+    document.querySelectorAll('#sheet-items .sheet-item').forEach(row => {
+      row.addEventListener('click', () => {
+        const g = row.dataset.sheetGoto;
+        closeSheet();
+        if(g) goto(g);
+      });
+    });
+  }
+  function closeSheet(){ document.getElementById('sheet-overlay').classList.remove('open'); }
+  document.getElementById('sheet-cancel').addEventListener('click', closeSheet);
+  document.getElementById('sheet-overlay').addEventListener('click', e => { if(e.target.id === 'sheet-overlay') closeSheet(); });
+  document.querySelectorAll('[data-sheet]').forEach(el => {
+    el.addEventListener('click', () => openSheet(el.dataset.sheet));
+  });
+
+  // ---- New group: member picker ----
+  const allContacts = [
+    {n:"Chidera", c:"UNILAG", i:"CU", col:"a-green", picked:true},
+    {n:"Tobi", c:"KAAF University College", i:"TB", col:"a-gold", picked:true},
+    {n:"Amara", c:"UNILAG", i:"A", col:"a-dark", picked:true},
+    {n:"Emeka", c:"UNIBEN", i:"EU", col:"a-green"},
+    {n:"Ngozi", c:"KAAF University College", i:"NG", col:"a-gold"},
+    {n:"Bezu", c:"UNIBEN", i:"BZ", col:"a-dark"},
+    {n:"Chinedu", c:"University of Ibadan", i:"CH", col:"a-green"},
+  ];
+  function renderMembers(filter){
+    const f = (filter || "").toLowerCase();
+    const rows = allContacts.filter(c => c.n.toLowerCase().includes(f));
+    document.getElementById('member-list').innerHTML = rows.map(c => `
+      <div class="contact-row ${c.picked ? 'picked' : ''}" data-name="${c.n}">
+        <div class="avatar ${c.col}" style="width:38px;height:38px;font-size:12px;">${c.i}</div>
+        <div style="flex:1;">
+          <div class="cname">${c.n}</div>
+          <div class="ccampus">${c.c}</div>
+        </div>
+        <div class="contact-check"></div>
+      </div>
+    `).join('');
+    document.querySelectorAll('.contact-row').forEach(row => {
+      row.addEventListener('click', () => {
+        row.classList.toggle('picked');
+        const n = document.querySelectorAll('.contact-row.picked').length;
+        document.getElementById('member-count').textContent = n + ' selected';
+      });
+    });
+  }
+  renderMembers('');
+  const memberSearch = document.querySelector('#view-newgroup-members .search-field input');
+  if (memberSearch) memberSearch.addEventListener('input', e => renderMembers(e.target.value));
+
+  // ---- Group info: member list ----
+  const groupMembers = [
+    {n:"Tobi", role:"Admin", i:"TB", col:"a-gold"},
+    {n:"Amara", role:"Member", i:"A", col:"a-dark"},
+    {n:"Chidera", role:"Member", i:"CU", col:"a-green"},
+    {n:"Emeka", role:"Member", i:"EU", col:"a-green"},
+    {n:"Ngozi", role:"Member", i:"NG", col:"a-gold"},
+    {n:"You", role:"Member", i:"EM", col:"a-dark"},
+  ];
+  document.getElementById('group-members').innerHTML = groupMembers.map(m => `
+    <div class="contact-row" style="cursor:default;">
+      <div class="avatar ${m.col}" style="width:38px;height:38px;font-size:12px;">${m.i}</div>
+      <div style="flex:1;">
+        <div class="cname">${m.n}</div>
+        <div class="ccampus">${m.role}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // ---- Wallpaper grid ----
+  const wallpapers = [
+    {bg:"#FFFFFF", sel:true}, {bg:"#0B3D26"}, {bg:"#F1F5F1"},
+    {bg:"#E3A857"}, {bg:"#145C38"}, {bg:"#1E5FA8"},
+    {bg:"#F6E6C9"}, {bg:"#B24D3E"}, {bg:"#6B4FA0"},
+  ];
+  document.getElementById('wallpaper-grid').innerHTML = wallpapers.map(w => `
+    <div class="wp-tile ${w.sel ? 'selected' : ''}" data-bg="${w.bg}" style="background:${w.bg}; ${w.bg === '#FFFFFF' ? 'border-color:var(--border);' : ''}"></div>
+  `).join('');
+  document.querySelectorAll('.wp-tile').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.wp-tile').forEach(x => x.classList.remove('selected'));
+      t.classList.add('selected');
+      document.documentElement.style.setProperty('--wallpaper', t.dataset.bg);
+    });
+  });
+
+  // ---- Toggles ----
+  document.querySelectorAll('[data-toggle]').forEach(t => {
+    t.innerHTML = '<div class="knob"></div>';
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+
+  // ---- Theme color: live-applies across the whole prototype ----
+  const THEMES = {
+    "#145C38": { green:"#145C38", greenDark:"#0B3D26", greenDarker:"#072A1A" },
+    "#1E5FA8": { green:"#1E5FA8", greenDark:"#123D6E", greenDarker:"#0A2749" },
+    "#B24D3E": { green:"#B24D3E", greenDark:"#7A3128", greenDarker:"#501F1A" },
+    "#6B4FA0": { green:"#6B4FA0", greenDark:"#4A3670", greenDarker:"#2E2148" },
+    "#1E8A8A": { green:"#1E8A8A", greenDark:"#145E5E", greenDarker:"#0C3D3D" },
+    "#A84E7C": { green:"#A84E7C", greenDark:"#723656", greenDarker:"#4A2338" },
+  };
+  function applyTheme(hex){
+    const t = THEMES[hex];
+    if(!t) return;
+    const root = document.documentElement.style;
+    root.setProperty('--green', t.green);
+    root.setProperty('--green-dark', t.greenDark);
+    root.setProperty('--green-darker', t.greenDarker);
+  }
+  document.querySelectorAll('[data-swatch]').forEach(sw => {
+    sw.addEventListener('click', () => {
+      document.querySelectorAll('[data-swatch]').forEach(x => x.classList.remove('selected'));
+      sw.classList.add('selected');
+      applyTheme(sw.style.backgroundColor ? rgbToHex(sw.style.backgroundColor) : null);
+    });
+  });
+  function rgbToHex(rgb){
+    const m = rgb.match(/\d+/g);
+    if(!m) return null;
+    return '#' + m.slice(0,3).map(n => (+n).toString(16).padStart(2,'0')).join('').toUpperCase();
+  }
+
+  // ---- Light / Dark / System mode: live-applies across the whole prototype ----
+  const LIGHT = { surface:"#FFFFFF", card:"#F1F5F1", border:"#E4E4DE", textDark:"#1E1E1C", textMuted:"#5B5D57", bubbleGray:"#F1F1ED" };
+  const DARK  = { surface:"#152019", card:"#1D2A22", border:"#2C3A32", textDark:"#EEF1EC", textMuted:"#9DB3A6", bubbleGray:"#223129" };
+  function applyMode(mode){
+    const isDark = mode === 'Dark' || (mode === 'System' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const p = isDark ? DARK : LIGHT;
+    const root = document.documentElement.style;
+    root.setProperty('--surface', p.surface);
+    root.setProperty('--card', p.card);
+    root.setProperty('--border', p.border);
+    root.setProperty('--text-dark', p.textDark);
+    root.setProperty('--text-muted', p.textMuted);
+    root.setProperty('--bubble-gray', p.bubbleGray);
+  }
+  document.querySelectorAll('[data-mode]').forEach(m => {
+    m.addEventListener('click', () => {
+      document.querySelectorAll('[data-mode]').forEach(x => x.classList.remove('selected'));
+      m.classList.add('selected');
+      applyMode(m.textContent.trim());
+    });
+  });
+
+  function goto(id){
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + id).classList.add('active');
+    document.querySelectorAll('.flow-item').forEach(f => f.classList.toggle('active', f.dataset.goto === id));
+  }
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => { if (el.dataset.goto) goto(el.dataset.goto); });
+  });
+</script>
+</body>
+</html>

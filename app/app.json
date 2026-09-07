@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Kuvo",
+    "slug": "zunda",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "zunda",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#072A1A"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.zunda.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#145C38",
+        "foregroundImage": "./assets/icon.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.zunda.app",
+      "permissions": [
+        "INTERNET",
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "READ_MEDIA_AUDIO",
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS"
+      ],
+      "usesCleartextTraffic": true,
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "./plugins/withCleartextTraffic",
+      "expo-font",
+      "expo-splash-screen",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Kuvo uses your photos for profile pictures, chats, and campus gist.",
+          "cameraPermission": "Kuvo uses the camera for profile pictures, chats, and campus gist."
+        }
+      ],
+      "expo-localization"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "tabs.chats": "Chats",
+  "tabs.gist": "Gist",
+  "tabs.groups": "Groups",
+  "tabs.calls": "Calls",
+  "fab.chat": "Chat",
+  "fab.group": "Group",
+  "fab.call": "Call",
+  "fab.you": "You",
+  "gist.youAreIn": "You dey for {campus} feed",
+  "gist.noCampus": "Choose your campus make you see your people.",
+  "gist.composer": "Send text, photo, video, or voice…",
+  "gist.empty": "Nobody post for campus yet. You fit start am.",
+  "calls.empty": "No calls yet. Press + then Call make you ring person wey dey Kuvo.",
+  "calls.missed": "Dem no pick — una two need open the app for the same API.",
+  "help.title": "Help",
+  "language.title": "App language",
+  "language.hint": "English dey the app. To add another language, put JSON file beside en.json — you no go recode screens."
+}

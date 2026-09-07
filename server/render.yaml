@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: kuvo-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /v1/health
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_STORE
+        value: postgres
+      - key: DEV_OTP
+        value: "1234"
+      - key: STRICT_OTP
+        value: "0"
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OTP_PEPPER
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        value: kuvo-media
+      - key: R2_PUBLIC_BASE
+        sync: false
+      - key: TERMII_API_KEY
+        sync: false
