@@ -1,3 +1,7 @@
+databases:
+  - name: kuvo-db
+    plan: free
+
 services:
   - type: web
     name: kuvo-api
@@ -21,7 +25,9 @@ services:
       - key: OTP_PEPPER
         generateValue: true
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: kuvo-db
+          property: connectionString
       - key: R2_ACCOUNT_ID
         sync: false
       - key: R2_ACCESS_KEY_ID
